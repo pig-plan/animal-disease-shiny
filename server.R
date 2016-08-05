@@ -5,7 +5,7 @@ library(jsonlite)
 
 # key <- "AIzaSyDvwglFuj1Ha8Fu09jYoPnKO_442oXcgKA"
 
-df <- read.csv('refined.csv', header = TRUE)
+df <- read.csv('refined.csv', header = TRUE, stringsAsFactors = FALSE)
 
 
 shinyServer(function(input, output) {
@@ -33,9 +33,9 @@ shinyServer(function(input, output) {
   
   output$range <- renderUI({
     sliderInput("range", "▷ 검색 기간",  
-                min = min(df$OCCRRNC_DE),
-                max = max(df$OCCRRNC_DE),
-                value = c(as.Date("20100102", "%Y%m%d"), max(df$OCCRRNC_DE))
+                min = min(as.Date(df$OCCRRNC_DE)),
+                max = max(as.Date(df$OCCRRNC_DE)),
+                value = c(as.Date("20100102", "%Y%m%d"), max(as.Date(df$OCCRRNC_DE)))
     )
   })
   
