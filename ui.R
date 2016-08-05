@@ -9,7 +9,7 @@ shinyUI(fluidPage(
   HTML("<br>
         <div style='text-align:center;'>
           <h1>
-            <span style='white-space: nowrap;'>가축질병 통계 </span>
+            <span style='white-space: nowrap;'>가축질병 통계 (Demo) </span>
         </div>
         <br><hr><br>"),
   
