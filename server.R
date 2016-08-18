@@ -4,11 +4,15 @@ library(data.table)
 library(jsonlite)
 library(htmltools)
 library(randomcoloR)
+library(doBy)
+library(ggplot2)
+library(ggthemes)
 
 
 df <- read.csv('geocoding/geocoded.csv', header = TRUE, stringsAsFactors = FALSE)
 df <- na.omit(df)
 df$OCCRRNC_DE <- as.Date(df$OCCRRNC_DE)
+maxCNT <- summaryBy(OCCRRNC_LVSTCKCNT ~ LKNTS_NM, data = df, FUN = max)
 
 
 shinyServer(function(input, output, session) {
@@ -25,15 +29,10 @@ shinyServer(function(input, output, session) {
   
   pal <- colorFactor(distinctColorPalette(ncolors), domain = levels(factor(df$LVSTCKSPC_NM)))
   
+  
   output$disease <- renderUI({
     selectInput("disease", "▷ 질병 선택",  
                 levels(factor(df$LKNTS_NM))
-    )
-  })
-  
-  output$animal <- renderUI({
-    selectInput("animal", "▷ 가축 선택",  
-                levels(factor(df$LVSTCKSPC_NM))
     )
   })
   
@@ -45,21 +44,18 @@ shinyServer(function(input, output, session) {
     )
   })
   
-  points <- eventReactive(input$recalc, {
-    cbind(rnorm(40) * 2 + 13, rnorm(40) + 48)
-  }, ignoreNULL = FALSE)
-  
   output$map <- renderLeaflet({
     leaflet() %>%
       addProviderTiles("Stamen.TonerLite", group = "흑백") %>%
-      addProviderTiles("Esri.WorldStreetMap", group = "거리") %>%
-      # addProviderTiles("OpenStreetMap.Mapnik", group = "거리") %>%
+      addProviderTiles("Esri.WorldStreetMap", group = "도로") %>%
       addProviderTiles("Esri.WorldImagery", group = "지형") %>%
-      setView(lng = 127.6, lat = 35.7, zoom = 7) %>%
+      setView(lng = 128.5, lat = 36, zoom = 6) %>%
       addLayersControl(
-        baseGroup = c("흑백", "거리", "지형"),
+        baseGroup = c("흑백", "도로", "지형"),
+        overlayGroups = c("클러스터", "피해규모"),
         options = layersControlOptions(collapsed = FALSE)
-      )
+      ) %>%
+      hideGroup("피해규모")
   })
   
   observe({
@@ -67,24 +63,34 @@ shinyServer(function(input, output, session) {
       clearShapes() %>%
       clearMarkers() %>%
       clearMarkerClusters() %>%
-      addCircleMarkers(~longitude, ~latitude, clusterOptions = markerClusterOptions(), popup = ~htmlEscape(paste(OCCRRNC_DE, ",", LVSTCKSPC_NM, ",", OCCRRNC_LVSTCKCNT, "마리")), stroke = FALSE, fillOpacity = 1, color = ~pal(LVSTCKSPC_NM))
+      addCircleMarkers(~longitude, ~latitude, clusterOptions = markerClusterOptions(), popup = ~htmlEscape(paste(OCCRRNC_DE, ",", LVSTCKSPC_NM, ",", OCCRRNC_LVSTCKCNT, "마리")), stroke = FALSE, fillOpacity = 1, color = ~pal(LVSTCKSPC_NM), group = "클러스터") %>%
+      addCircles(~longitude, ~latitude, ~sqrt(OCCRRNC_LVSTCKCNT / maxCNT[maxCNT$LKNTS_NM == input$disease, ][[2]]) * 10000, popup = ~htmlEscape(paste(OCCRRNC_DE, ",", LVSTCKSPC_NM, ",", OCCRRNC_LVSTCKCNT, "마리")), stroke = FALSE, fillOpacity = 0.6, color = ~pal(LVSTCKSPC_NM), group = "피해규모")
   })
   
   observe({
     input$reset
     leafletProxy("map") %>%
-      setView(lng = 127.6, lat = 35.7, zoom = 7)
+      setView(lng = 128.5, lat = 36, zoom = 6)
   })
   
-  # output$animation <- renderUI({
-  #   sliderInput("animation", "▷ 시계열 애니메이션",
-  #               min = min(df$OCCRRNC_DE),
-  #               max = max(df$OCCRRNC_DE),
-  #               value = min(df$OCCRRNC_DE),
-  #               step = 1,
-  #               animate = animationOptions(interval = 10)
-  #   )
-  # })
+  output$diseaseName <- renderText({
+    paste(input$disease, " ", input$range[1], " _ ", input$range[2])
+  })
+  
+  output$hist <- renderPlot({
+    ggplot(reactive_data(), aes(LVSTCKSPC_NM)) +
+      geom_bar() +
+      labs(title = "히스토그램", x = "축종", y = "가구수") +
+      theme_economist()
+    
+  })
+  
+  output$series <- renderPlot({
+    ggplot(reactive_data(), aes(OCCRRNC_DE, OCCRRNC_LVSTCKCNT)) +
+      geom_point() +
+      labs(title = "시계열", x = "진단일자", y = "두수") +
+      theme_economist()
+  })
   
 })
 

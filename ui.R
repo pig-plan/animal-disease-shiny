@@ -2,6 +2,7 @@ library(shiny)
 library(shinythemes)
 library(leaflet)
 
+
 shinyUI(fluidPage(
   
   theme = shinytheme("flatly"),
@@ -31,17 +32,28 @@ shinyUI(fluidPage(
   fluidRow(
     
     column(12,
-      leafletOutput("map", height = "900px")
+      leafletOutput("map", height = 500)
     )
            
-  )
+  ),
   
-  # fluidRow(
-  # 
-  #   column(12,
-  #     uiOutput("animation")
-  #   )
-  # 
-  # )
+  fluidRow(
+    column(12,
+      h4(textOutput("diseaseName"), align = "left")
+    )
+  ),
+  
+  fluidRow(
+    
+    column(6,
+      plotOutput("hist", height = 200),
+      br(), br(), br()
+    ),
+    column(6,
+      plotOutput("series", height = 200),
+      br(), br(), br()
+    )
+    
+  )
 
 ))
