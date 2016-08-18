@@ -80,7 +80,7 @@ shinyServer(function(input, output, session) {
   
   output$hist <- renderPlotly({
     p <- ggplot(reactive_data(), aes(LVSTCKSPC_NM)) +
-      geom_bar() +
+      geom_bar(alpha = 0.8) +
       theme_economist() +
       theme(axis.text.x = element_text(angle = 90)) 
     gg <- ggplotly(p)
@@ -95,7 +95,7 @@ shinyServer(function(input, output, session) {
   
   output$series <- renderPlotly({
     p <- ggplot(reactive_data(), aes(OCCRRNC_DE, OCCRRNC_LVSTCKCNT)) +
-      geom_point() +
+      geom_point(alpha = 0.3) +
       theme_economist()
     gg <- ggplotly(p)
     gg %>% layout(
