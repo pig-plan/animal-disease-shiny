@@ -1,7 +1,7 @@
 library(shiny)
 library(shinythemes)
 library(leaflet)
-
+library(plotly)
 
 shinyUI(fluidPage(
   
@@ -32,7 +32,7 @@ shinyUI(fluidPage(
   fluidRow(
     
     column(12,
-      leafletOutput("map", height = 500)
+      leafletOutput("Map1", height = 500)
     )
            
   ),
@@ -46,11 +46,11 @@ shinyUI(fluidPage(
   fluidRow(
     
     column(6,
-      plotOutput("hist", height = 200),
+      plotlyOutput("hist", height = 200),
       br(), br(), br()
     ),
     column(6,
-      plotOutput("series", height = 200),
+      plotlyOutput("series", height = 200),
       br(), br(), br()
     )
     

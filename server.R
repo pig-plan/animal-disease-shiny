@@ -7,6 +7,7 @@ library(randomcoloR)
 library(doBy)
 library(ggplot2)
 library(ggthemes)
+library(plotly)
 
 
 df <- read.csv('geocoding/geocoded.csv', header = TRUE, stringsAsFactors = FALSE)
@@ -44,7 +45,7 @@ shinyServer(function(input, output, session) {
     )
   })
   
-  output$map <- renderLeaflet({
+  output$Map1 <- renderLeaflet({
     leaflet() %>%
       addProviderTiles("Stamen.TonerLite", group = "흑백") %>%
       addProviderTiles("Esri.WorldStreetMap", group = "도로") %>%
@@ -59,7 +60,7 @@ shinyServer(function(input, output, session) {
   })
   
   observe({
-    leafletProxy("map", data = reactive_data()) %>%
+    leafletProxy("Map1", data = reactive_data()) %>%
       clearShapes() %>%
       clearMarkers() %>%
       clearMarkerClusters() %>%
@@ -69,7 +70,7 @@ shinyServer(function(input, output, session) {
   
   observe({
     input$reset
-    leafletProxy("map") %>%
+    leafletProxy("Map1") %>%
       setView(lng = 128.5, lat = 36, zoom = 6)
   })
   
@@ -77,19 +78,32 @@ shinyServer(function(input, output, session) {
     paste(input$disease, " ", input$range[1], " _ ", input$range[2])
   })
   
-  output$hist <- renderPlot({
-    ggplot(reactive_data(), aes(LVSTCKSPC_NM)) +
+  output$hist <- renderPlotly({
+    p <- ggplot(reactive_data(), aes(LVSTCKSPC_NM)) +
       geom_bar() +
-      labs(title = "히스토그램", x = "축종", y = "가구수") +
-      theme_economist()
+      theme_economist() +
+      theme(axis.text.x = element_text(angle = 90)) 
+    gg <- ggplotly(p)
+    gg %>% layout(
+      title = "축종별",
+      titlefont = list(size = 14),
+      xaxis = list(title = ""),
+      yaxis = list(title = "가구수")
+    )
     
   })
   
-  output$series <- renderPlot({
-    ggplot(reactive_data(), aes(OCCRRNC_DE, OCCRRNC_LVSTCKCNT)) +
+  output$series <- renderPlotly({
+    p <- ggplot(reactive_data(), aes(OCCRRNC_DE, OCCRRNC_LVSTCKCNT)) +
       geom_point() +
-      labs(title = "시계열", x = "진단일자", y = "두수") +
       theme_economist()
+    gg <- ggplotly(p)
+    gg %>% layout(
+      title = "시계열",
+      titlefont = list(size = 14),
+      xaxis = list(title = "진단일자"),
+      yaxis = list(title = "두수")
+    )
   })
   
 })
