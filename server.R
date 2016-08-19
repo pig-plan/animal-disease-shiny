@@ -48,11 +48,13 @@ shinyServer(function(input, output, session) {
   output$Map1 <- renderLeaflet({
     leaflet() %>%
       addProviderTiles("Stamen.TonerLite", group = "흑백") %>%
+      addProviderTiles("CartoDB.PositronNoLabels", group = "단순") %>%
       addProviderTiles("Esri.WorldStreetMap", group = "도로") %>%
-      addProviderTiles("Esri.WorldImagery", group = "지형") %>%
+      addProviderTiles("Esri.NatGeoWorldMap", group = "지형") %>%
+      addProviderTiles("Esri.WorldImagery", group = "사진") %>%
       setView(lng = 128.5, lat = 36, zoom = 6) %>%
       addLayersControl(
-        baseGroup = c("흑백", "도로", "지형"),
+        baseGroup = c("흑백", "단순", "도로", "지형", "사진"),
         overlayGroups = c("클러스터", "피해규모"),
         options = layersControlOptions(collapsed = FALSE)
       ) %>%
