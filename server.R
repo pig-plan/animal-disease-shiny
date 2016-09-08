@@ -47,14 +47,13 @@ shinyServer(function(input, output, session) {
   
   output$Map1 <- renderLeaflet({
     leaflet() %>%
-      addProviderTiles("Stamen.TonerLite", group = "흑백") %>%
+      addTiles() %>%
+      addProviderTiles("Thunderforest.Outdoors", group = "기본") %>%
       addProviderTiles("CartoDB.PositronNoLabels", group = "단순") %>%
-      addProviderTiles("Esri.WorldStreetMap", group = "도로") %>%
-      addProviderTiles("Esri.NatGeoWorldMap", group = "지형") %>%
       addProviderTiles("Esri.WorldImagery", group = "사진") %>%
-      setView(lng = 128.5, lat = 36, zoom = 6) %>%
+      setView(lng = 128, lat = 36, zoom = 6) %>%
       addLayersControl(
-        baseGroup = c("흑백", "단순", "도로", "지형", "사진"),
+        baseGroup = c("기본", "단순", "사진"),
         overlayGroups = c("클러스터", "피해규모"),
         options = layersControlOptions(collapsed = FALSE)
       ) %>%
@@ -73,7 +72,7 @@ shinyServer(function(input, output, session) {
   observe({
     input$reset
     leafletProxy("Map1") %>%
-      setView(lng = 128.5, lat = 36, zoom = 6)
+      setView(lng = 128, lat = 36, zoom = 6)
   })
   
   output$diseaseName <- renderText({
@@ -97,7 +96,7 @@ shinyServer(function(input, output, session) {
   
   output$series <- renderPlotly({
     p <- ggplot(reactive_data(), aes(OCCRRNC_DE, OCCRRNC_LVSTCKCNT)) +
-      geom_point(alpha = 0.3) +
+      geom_point(alpha = 0.15) +
       theme_economist()
     gg <- ggplotly(p)
     gg %>% layout(
