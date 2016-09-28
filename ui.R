@@ -5,6 +5,8 @@ library(plotly)
 
 shinyUI(fluidPage(
   
+  includeCSS("styles.css"),
+  
   theme = shinytheme("flatly"),
   
   HTML("<br>

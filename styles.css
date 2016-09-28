@@ -1,0 +1,9 @@
+/*plotly toolbox off*/
+.modebar {
+  display: none;
+}
+
+
+.at-sep, .at-input, .at-btn {
+  display: none;
+}
