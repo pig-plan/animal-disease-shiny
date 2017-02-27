@@ -9,8 +9,7 @@ library(ggplot2)
 library(ggthemes)
 library(plotly)
 
-
-df <- read.csv('geocoding/geocoded.csv', header = TRUE, stringsAsFactors = FALSE)
+df <- read.csv('geocoding/geocoded.csv', header = TRUE ,stringsAsFactors = FALSE )
 df <- na.omit(df)
 df$OCCRRNC_DE <- as.Date(df$OCCRRNC_DE)
 maxCNT <- summaryBy(OCCRRNC_LVSTCKCNT ~ LKNTS_NM, data = df, FUN = max)
@@ -108,3 +107,4 @@ shinyServer(function(input, output, session) {
   })
 
 })
+

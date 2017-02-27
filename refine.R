@@ -1,6 +1,6 @@
 library(jsonlite)
 
-json <- fromJSON('disease_20160803.json')
+json <- fromJSON('disease_20170223.json')
 df_raw <- json$data
 df_all <- unique(df_raw)
 df_all$OCCRRNC_DE <- as.Date(df_all$OCCRRNC_DE, "%Y%m%d")
